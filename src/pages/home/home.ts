@@ -1,55 +1,112 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { ImagePicker } from '@ionic-native/image-picker';
-import { Http } from '@angular/http';
-
+import { HTTP } from '@ionic-native/http';
+import {Http, HttpModule} from '@angular/http';
 
 @Component({
-  selector: 'page-home',
-  templateUrl: 'home.html'
+selector: 'page-home',
+templateUrl: 'home.html'
 })
 export class HomePage {
 
-  constructor(public navCtrl: NavController, private camera: Camera, private imagePicker: ImagePicker, private http: Http) {
+    private APIKEY = '';
+    private image;
+    public list;
 
-    // Google Vision API Key
-    // AIzaSyAm_kKU9XNG-ZpIYXmQ59l372jB74quchQ
-
-    // Vision API key https://cloud.google.com/vision/docs/auth
-
-  }
-
-
-  public loadCamera()
-  {
-    const options: CameraOptions = {
-      quality: 100,
-      destinationType: this.camera.DestinationType.DATA_URL,
-      encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE
+    constructor(public navCtrl: NavController, private camera: Camera, private http: HTTP, private http2: Http) {
     }
 
-    this.camera.getPicture(options).then((imageData) => {
-      // imageData is either a base64 encoded string or a file URI
-      // If it's base64:
-      let base64Image = 'data:image/jpeg;base64,' + imageData;
-    }, (err) => {
-      // Handle error
-    });
-  }
+    public handleFileSelect(evt) {
+        var files = evt.target.files;
+        var file = files[0];
 
-  public submitImage()
-  {
-    let options = {
-      maximumImagesCount: 1,
-    };
+        if (files && file) {
+            var reader = new FileReader();
+            reader.onload = this._handleReaderLoaded.bind(this);
+            reader.readAsBinaryString(file);
+        }
+    }
 
-    this.imagePicker.getPictures(options).then((results) => {
-      for (var i = 0; i < results.length; i++) {
-        console.log('Image URI: ' + results[i]);
-      }
-    }, (err) => { });
-  }
+    private _handleReaderLoaded(readerEvt) {
+        var binaryString = readerEvt.target.result;
+        this.image = btoa(binaryString);
+    }
 
+    public getResults() {
+        let requestData = this.getRequestObject();
+        this.http2.post('https://vision.googleapis.com/v1/images:annotate?key=' + this.APIKEY, requestData, {})
+            .subscribe(data => {
+                console.log(data);
+                if (data.ok) {
+                    this.getList(data.json().responses[0].labelAnnotations);
+                    console.log(this.list);
+                }
+            });
+    }
+
+    private getRequestObject() {
+        return {
+            "requests": [
+                {
+                    "image": {
+                        "content": this.image
+                    },
+                    "features": [
+                        {
+                            "type": "LABEL_DETECTION",
+                            "maxResults": 10
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+    private getList(data)
+    {
+
+        this.list = data;
+    }
+
+
+    // public submitImage()
+    // {
+    //     const options: CameraOptions = {
+    //         quality: 100,
+    //         destinationType: this.camera.DestinationType.DATA_URL,
+    //         encodingType: this.camera.EncodingType.JPEG,
+    //         mediaType: this.camera.MediaType.PICTURE,
+    //         sourceType: 2
+    //     }
+    //
+    //     this.camera.getPicture(options).then((imageData) => {
+    //         this.image  = 'data:image/jpeg;base64,' + imageData;
+    //         let result = this.getResults();
+    //     }, (err) => {
+    //         alert(err)
+    //     });
+    // }
+    //
+    // public loadCamera()
+    // {
+    //     // const options: CameraOptions = {
+    //     //   quality: 100,
+    //     //   destinationType: this.camera.DestinationType.DATA_URL,
+    //     //   encodingType: this.camera.EncodingType.JPEG,
+    //     //   mediaType: this.camera.MediaType.PICTURE
+    //     // }
+    //     //
+    //     // this.camera.getPicture(options).then((imageData) => {
+    //     //  this.image  = 'data:image/jpeg;base64,' + imageData;
+    //     //  let result = this.getResults();
+    //     // }, (err) => {
+    //     //   alert(err)
+    //     // });
+    //
+    //     // let imageData = this.encodeImageFileAsURL('../../../../resources/images/test.jpg')
+    //
+    //     // this.image  =  imageData;
+    //     let result = this.getResults();
+    // }
 }

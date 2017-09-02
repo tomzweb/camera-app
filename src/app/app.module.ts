@@ -10,7 +10,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { Camera } from '@ionic-native/camera';
-import { ImagePicker } from '@ionic-native/image-picker';
+import { HTTP } from '@ionic-native/http';
 
 
 @NgModule({
@@ -27,13 +27,12 @@ import { ImagePicker } from '@ionic-native/image-picker';
   entryComponents: [
     MyApp,
     HomePage,
-
   ],
   providers: [
     StatusBar,
     SplashScreen,
     Camera,
-    ImagePicker,
+    HTTP,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

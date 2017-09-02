@@ -9,8 +9,18 @@
 
 <ion-content padding>
 
-  <button ion-button (click)="loadCamera()">Load Camera</button>
+  <button ion-button (click)="getResults()">Get Results</button>
 
-  <button ion-button (click)="submitImage()">Submit Image</button>
+  <input type="file" (change)="handleFileSelect($event)" />
+
+  <!--<button ion-button (click)="submitImage()">Submit Image</button>-->
+
+    <ion-list>
+
+        <ion-item *ngFor="let item of list">
+            {{ item.description }}
+        </ion-item>
+
+    </ion-list>
 
 </ion-content>
