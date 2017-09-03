@@ -12,7 +12,6 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { Camera } from '@ionic-native/camera';
 import { HTTP } from '@ionic-native/http';
 
-
 @NgModule({
   declarations: [
     MyApp,

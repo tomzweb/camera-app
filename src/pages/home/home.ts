@@ -10,14 +10,17 @@ templateUrl: 'home.html'
 })
 export class HomePage {
 
-    private APIKEY = '';
+    private APIKEY = 'AIzaSyAm_kKU9XNG-ZpIYXmQ59l372jB74quchQ';
     private image;
-    public list;
+    public list = [];
+    private dogs;
 
     constructor(public navCtrl: NavController, private camera: Camera, private http: HTTP, private http2: Http) {
+        this.getDogs();
     }
 
     public handleFileSelect(evt) {
+
         var files = evt.target.files;
         var file = files[0];
 
@@ -40,7 +43,7 @@ export class HomePage {
                 console.log(data);
                 if (data.ok) {
                     this.getList(data.json().responses[0].labelAnnotations);
-                    console.log(this.list);
+                    //console.log(this.list);
                 }
             });
     }
@@ -65,8 +68,24 @@ export class HomePage {
 
     private getList(data)
     {
+        console.log(this.dogs);
+        for (let item in data) {
+            console.log(data[item].description.toUpperCase());
+            // TODO: Figure out the upper case / lower case BS
+            // console.log(this.dogs.indexOf(data[item].description.toUpperCase()));
+            // console.log(this.dogs.indexOf(data[item].description.toUpperCase()));
+            // if (this.dogs.indexOf(data[item].description.toLowerCase())) {
+            //     this.list.push(item);
+            // }
+        }
+        console.log(this.list);
+    }
 
-        this.list = data;
+    private getDogs()
+    {
+        return this.http2.get('./json/dogs.json').subscribe(data => {
+           this.dogs = data.json();
+        });
     }
 
 
