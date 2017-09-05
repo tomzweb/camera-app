@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import {Http, HttpModule} from '@angular/http';
+import { ImagePicker } from '@ionic-native/image-picker';
+
 
 @Component({
 selector: 'page-home',
@@ -14,7 +16,7 @@ export class HomePage {
     public list = [];
     private dogs;
 
-    constructor(public navCtrl: NavController, private camera: Camera, private http: Http) {
+    constructor(public navCtrl: NavController, private camera: Camera, private http: Http, private imagePicker: ImagePicker) {
         this.getDogs();
     }
 
@@ -58,6 +60,21 @@ export class HomePage {
         }, (err) => {
             alert(err)
         });
+    }
+
+    public chooseExisting()
+    {
+        const options = {
+            maximumImagesCount: 1,
+            quality: 70,
+            width: 640,
+        }
+
+        this.imagePicker.getPictures(options).then((results) => {
+            for (var i = 0; i < results.length; i++) {
+                this.image = results[i];
+            }
+        }, (err) => { });
     }
 
     public getResults() {
