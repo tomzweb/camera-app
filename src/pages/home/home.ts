@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { HTTP } from '@ionic-native/http';
 import {Http, HttpModule} from '@angular/http';
 
 @Component({
@@ -15,10 +14,14 @@ export class HomePage {
     public list = [];
     private dogs;
 
-    constructor(public navCtrl: NavController, private camera: Camera, private http: HTTP, private http2: Http) {
+    constructor(public navCtrl: NavController, private camera: Camera, private http: Http) {
         this.getDogs();
     }
 
+    /**
+     * File Input / Browser
+     * @param evt
+     */
     public handleFileSelect(evt) {
 
         var files = evt.target.files;
@@ -36,9 +39,30 @@ export class HomePage {
         this.image = btoa(binaryString);
     }
 
+    /**
+     * Directly from the camera
+     */
+    public loadCamera()
+    {
+        const options: CameraOptions = {
+            quality: 70,
+            targetWidth: 640,
+            destinationType: this.camera.DestinationType.DATA_URL,
+            encodingType: this.camera.EncodingType.JPEG,
+            mediaType: this.camera.MediaType.PICTURE
+        }
+
+        this.camera.getPicture(options).then((imageData) => {
+            this.image  = 'data:image/jpeg;base64,' + imageData;
+            let result = this.getResults();
+        }, (err) => {
+            alert(err)
+        });
+    }
+
     public getResults() {
         let requestData = this.getRequestObject();
-        this.http2.post('https://vision.googleapis.com/v1/images:annotate?key=' + this.APIKEY, requestData, {})
+        this.http.post('https://vision.googleapis.com/v1/images:annotate?key=' + this.APIKEY, requestData, {})
             .subscribe(data => {
                 console.log(data);
                 if (data.ok) {
@@ -83,49 +107,8 @@ export class HomePage {
 
     private getDogs()
     {
-        return this.http2.get('./json/dogs.json').subscribe(data => {
+        return this.http.get('./json/dogs.json').subscribe(data => {
            this.dogs = data.json();
         });
     }
-
-
-    // public submitImage()
-    // {
-    //     const options: CameraOptions = {
-    //         quality: 100,
-    //         destinationType: this.camera.DestinationType.DATA_URL,
-    //         encodingType: this.camera.EncodingType.JPEG,
-    //         mediaType: this.camera.MediaType.PICTURE,
-    //         sourceType: 2
-    //     }
-    //
-    //     this.camera.getPicture(options).then((imageData) => {
-    //         this.image  = 'data:image/jpeg;base64,' + imageData;
-    //         let result = this.getResults();
-    //     }, (err) => {
-    //         alert(err)
-    //     });
-    // }
-    //
-    // public loadCamera()
-    // {
-    //     // const options: CameraOptions = {
-    //     //   quality: 100,
-    //     //   destinationType: this.camera.DestinationType.DATA_URL,
-    //     //   encodingType: this.camera.EncodingType.JPEG,
-    //     //   mediaType: this.camera.MediaType.PICTURE
-    //     // }
-    //     //
-    //     // this.camera.getPicture(options).then((imageData) => {
-    //     //  this.image  = 'data:image/jpeg;base64,' + imageData;
-    //     //  let result = this.getResults();
-    //     // }, (err) => {
-    //     //   alert(err)
-    //     // });
-    //
-    //     // let imageData = this.encodeImageFileAsURL('../../../../resources/images/test.jpg')
-    //
-    //     // this.image  =  imageData;
-    //     let result = this.getResults();
-    // }
 }

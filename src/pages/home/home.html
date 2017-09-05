@@ -9,12 +9,15 @@
 
 <ion-content padding>
 
-  <button ion-button (click)="getResults()">Get Results</button>
+    <button ion-button block (click)="loadCamera()">Camera</button>
 
-  <input type="file" (change)="handleFileSelect($event)" />
+    <button ion-button block (click)="chooseExisting()">Choose existing image</button>
 
-  <!--<button ion-button (click)="submitImage()">Submit Image</button>-->
+    <button ion-button block (click)="getResults()">Get Results</button>
 
+    <input type="file" (change)="handleFileSelect($event)" />
+
+    <h1 *ngIf="list.length > 0">Results</h1>
     <ion-list>
 
         <ion-item *ngFor="let item of list">
