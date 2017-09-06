@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import {ActionSheetController, NavController} from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import {Http, HttpModule} from '@angular/http';
 import { ImagePicker } from '@ionic-native/image-picker';
+import { Device } from '@ionic-native/device';
+
 
 
 @Component({
@@ -11,13 +13,40 @@ templateUrl: 'home.html'
 })
 export class HomePage {
 
-    private APIKEY = 'AIzaSyAm_kKU9XNG-ZpIYXmQ59l372jB74quchQ';
     private image;
     public list = [];
     private dogs;
+    public results;
 
-    constructor(public navCtrl: NavController, private camera: Camera, private http: Http, private imagePicker: ImagePicker) {
+    constructor(
+        public navCtrl: NavController,
+        private camera: Camera,
+        private http: Http,
+        private imagePicker: ImagePicker,
+        public actionSheetCtrl: ActionSheetController,
+        private device: Device
+    ) {
         this.getDogs();
+    }
+
+    chooseImage() {
+        let actionSheet = this.actionSheetCtrl.create({
+            title: 'Select Image From',
+            buttons: [
+                {
+                    text: 'Camera',
+                    handler: () => {
+                       return this.loadCamera();
+                    }
+                },{
+                    text: 'Photo Library',
+                    handler: () => {
+                        return this.chooseExisting();
+                    }
+                }
+            ]
+        });
+        actionSheet.present();
     }
 
     /**
@@ -39,6 +68,7 @@ export class HomePage {
     private _handleReaderLoaded(readerEvt) {
         var binaryString = readerEvt.target.result;
         this.image = btoa(binaryString);
+        // this.getResults();
     }
 
     /**
@@ -73,37 +103,25 @@ export class HomePage {
         this.imagePicker.getPictures(options).then((results) => {
             for (var i = 0; i < results.length; i++) {
                 this.image = results[i];
+                let result = this.getResults();
             }
-        }, (err) => { });
+        }, (err) => {
+            alert(err);
+        });
     }
 
     public getResults() {
         let requestData = this.getRequestObject();
-        this.http.post('https://vision.googleapis.com/v1/images:annotate?key=' + this.APIKEY, requestData, {})
+        this.http.post('http://localhost/api/dogs', requestData, {})
             .subscribe(data => {
-                console.log(data);
-                if (data.ok) {
-                    this.getList(data.json().responses[0].labelAnnotations);
-                    //console.log(this.list);
-                }
+                this.results = data;
             });
     }
 
     private getRequestObject() {
         return {
-            "requests": [
-                {
-                    "image": {
-                        "content": this.image
-                    },
-                    "features": [
-                        {
-                            "type": "LABEL_DETECTION",
-                            "maxResults": 10
-                        }
-                    ]
-                }
-            ]
+            "image" : this.image,
+            "device" : this.device.uuid
         }
     }
 

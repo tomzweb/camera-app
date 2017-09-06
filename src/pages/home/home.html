@@ -1,21 +1,18 @@
-<ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>Home</ion-title>
-  </ion-navbar>
-</ion-header>
 
 <ion-content padding>
 
-    <button ion-button block (click)="loadCamera()">Camera</button>
 
-    <button ion-button block (click)="chooseExisting()">Choose existing image</button>
+    <ion-grid>
+        <ion-row align-self-center>
+            <ion-col>
+                    <button class="large" ion-button clear block (click)="chooseImage()">
+                        <ion-icon ios="ios-camera" md="md-camera" block></ion-icon>
+                    </button>
+                    <input type="file" (change)="handleFileSelect($event)" />
+            </ion-col>
+        </ion-row>
+    </ion-grid>
 
-    <button ion-button block (click)="getResults()">Get Results</button>
-
-    <input type="file" (change)="handleFileSelect($event)" />
 
     <h1 *ngIf="list.length > 0">Results</h1>
     <ion-list>
