@@ -5,8 +5,6 @@ import {Http, HttpModule} from '@angular/http';
 import { ImagePicker } from '@ionic-native/image-picker';
 import { Device } from '@ionic-native/device';
 
-
-
 @Component({
 selector: 'page-home',
 templateUrl: 'home.html'
@@ -24,7 +22,7 @@ export class HomePage {
         private http: Http,
         private imagePicker: ImagePicker,
         public actionSheetCtrl: ActionSheetController,
-        private device: Device
+        private device: Device,
     ) {
         this.getDogs();
     }
@@ -68,7 +66,7 @@ export class HomePage {
     private _handleReaderLoaded(readerEvt) {
         var binaryString = readerEvt.target.result;
         this.image = btoa(binaryString);
-        // this.getResults();
+        this.getResults();
     }
 
     /**
@@ -85,7 +83,7 @@ export class HomePage {
         }
 
         this.camera.getPicture(options).then((imageData) => {
-            this.image  = 'data:image/jpeg;base64,' + imageData;
+            this.image  = imageData;
             let result = this.getResults();
         }, (err) => {
             alert(err)
@@ -111,11 +109,16 @@ export class HomePage {
     }
 
     public getResults() {
-        let requestData = this.getRequestObject();
-        this.http.post('http://localhost/api/dogs', requestData, {})
-            .subscribe(data => {
-                this.results = data;
-            });
+        let data = [{
+            'name' : "Tom",
+        }]
+        this.navCtrl.push('ResultsPage', data);
+
+        // let requestData = this.getRequestObject();
+        // this.http.post('http://localhost/api/dogs', requestData, {})
+        // .subscribe(data => {
+        //     this.navCtrl.push('ResultsPage', data);
+        // });
     }
 
     private getRequestObject() {
@@ -127,17 +130,6 @@ export class HomePage {
 
     private getList(data)
     {
-        console.log(this.dogs);
-        for (let item in data) {
-            console.log(data[item].description.toUpperCase());
-            // TODO: Figure out the upper case / lower case BS
-            // console.log(this.dogs.indexOf(data[item].description.toUpperCase()));
-            // console.log(this.dogs.indexOf(data[item].description.toUpperCase()));
-            // if (this.dogs.indexOf(data[item].description.toLowerCase())) {
-            //     this.list.push(item);
-            // }
-        }
-        console.log(this.list);
     }
 
     private getDogs()

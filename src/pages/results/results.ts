@@ -15,11 +15,19 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ResultsPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  private results;
+
+  constructor(public navCtrl: NavController, params:NavParams) {
+//    console.log(params.data);
+    if (Object.keys(params.data).length === 0 && params.data.constructor === Object) {
+        this.navCtrl.push("HomePage");
+    }
+    this.results = params.data;
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ResultsPage');
+    console.log(this.results)
   }
 
 }

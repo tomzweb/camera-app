@@ -12,7 +12,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { Camera } from '@ionic-native/camera';
 import { ImagePicker } from '@ionic-native/image-picker';
 import { Device } from '@ionic-native/device';
-
+import { ResultsPage } from '../pages/results/results';
 
 @NgModule({
   declarations: [
